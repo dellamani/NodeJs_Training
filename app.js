@@ -8,10 +8,14 @@ const { notFound, convertError } = require('./middleware/errorMiddleware')
 const Employee = require('./models/employees');
 const Department = require('./models/departments');
 const EmpDept = require('./models/employeeDepartment');
+const Role = require('./models/roles');
+const EmpRole = require('./models/employeeRole');
+const Address = require('./models/address');
 
 const empRoutes = require('./routes/employees');
 const depRoutes = require('./routes/departments');
-
+const roleRoute = require('./routes/roles');
+const loginRoute = require('./routes/login');
 
 /**
 * Express instance
@@ -26,6 +30,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // API routes
 app.use('/employees', empRoutes);
 app.use('/departments', depRoutes);
+app.use('/roles', roleRoute);
+app.use('/login',loginRoute)
+// app.use('/address',addressRoute)
 
 // Error Middlewares
 app.use(notFound);
@@ -47,12 +54,27 @@ EmpDept.belongsTo(Department, {
     onDelete: 'CASCADE'
 });
 
+EmpRole.belongsTo(Employee, {
+    foreignKey: {
+        name: 'empId'
+    },
+    onDelete: 'CASCADE'
+});
+
+// Department.hasMany(EmpDept);
+EmpRole.belongsTo(Role, {
+    foreignKey: {
+        name: 'roleId'
+    },
+    onDelete: 'CASCADE'
+});
+
 
 sequelize
     .sync()
     .then(result => {
         console.log('Listening for requests at http://localhost:7001');
-        app.listen(7001);
+        app.listen(7002);
     })
     .catch(err => {
         console.log(err);
